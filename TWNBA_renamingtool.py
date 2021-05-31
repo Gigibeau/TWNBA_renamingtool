@@ -30,6 +30,11 @@ checkbutton_i.grid(row=0, column=2)
 checkbutton_csv = Checkbutton(root, text='rename summary.csv', variable=var_csv)
 checkbutton_csv.grid(row=0, column=3)
 
+entry_underscores = Entry(root, width=20)
+entry_underscores.insert(END, 'How many underscores?')
+entry_underscores.grid(row=0, column=4, columnspan=2)
+entry_underscores.bind("<Button-1>", some_callback)
+
 entry_lines = Entry(root, width=20)
 entry_lines.insert(END, 'How many diffrent names?')
 entry_lines.grid(row=1, column=0, columnspan=2)
@@ -38,7 +43,8 @@ entry_lines.bind("<Button-1>", some_callback)
 button_lines = Button(root, text='Generate', command=lambda: generate_lines(int(entry_lines.get())))
 button_lines.grid(row=1, column=2)
 
-button_rename = Button(root, text='Rename', command=lambda: rename(var_h.get(), var_i.get(), var_csv.get()))
+button_rename = Button(root, text='Rename', command=lambda: rename(var_h.get(), var_i.get(), var_csv.get(),
+                                                                   entry_underscores.get()))
 button_rename.grid(row=1, column=3)
 
 
@@ -81,9 +87,14 @@ def generate_lines(lines_count):
         lines_list.append(Entryline(line + 2, old_name))
 
 
-def rename(h_check, i_check, csv_check):
+def rename(h_check, i_check, csv_check, underscores):
     # Loading the files in the same dictionary as the script
     files = glob.glob(current_directory + '/*')
+
+    if underscores == 'How many underscores?':
+        underscore_count = 2
+    else:
+        underscore_count = int(underscores)
 
     names = {}
     for line in range(len(lines_list)):
@@ -109,23 +120,33 @@ def rename(h_check, i_check, csv_check):
 
         # replacing the old names with the new names
         for key, value in names.items():
-            if parts[-1] == 'csv':
-                pass
-            elif key == parts[3]:
+            if key == parts[underscore_count + 1]:
                 # Renaming the 3D files
                 if parts[-2] == "3D":
-                    new_name = '{}_{}_'.format(parts[0], parts[1]) + value + '_3D' + "." + parts[-1]
+                    new_name_builder = ''
+                    for underscore in range(underscore_count + 1):
+                        new_name_builder += str(parts[underscore] + '_')
+
+                    new_name = new_name_builder + value + '_3D' + "." + parts[-1]
                     print("Replacing " + file + "'s name with " + new_name)
                     os.rename(file, new_name)
                 # Renaming the 2D files
                 elif parts[-2] == "C":
-                    new_name = '{}_{}_'.format(parts[0], parts[1]) + value + '_2D' + "." + parts[-1]
+                    new_name_builder = ''
+                    for underscore in range(underscore_count + 1):
+                        new_name_builder += str(parts[underscore] + '_')
+
+                    new_name = new_name_builder + value + '_2D' + "." + parts[-1]
                     print("Replacing " + file + "'s name with " + new_name)
                     os.rename(file, new_name)
                     # Renaming all the other files
                 else:
                     try:
-                        new_name = '{}_{}_'.format(parts[0], parts[1]) + value + "." + parts[-1]
+                        new_name_builder = ''
+                        for underscore in range(underscore_count + 1):
+                            new_name_builder += str(parts[underscore] + '_')
+
+                        new_name = new_name_builder + value + "." + parts[-1]
                         print("Replacing " + file + "'s name with " + new_name)
                         os.rename(file, new_name)
                     except FileNotFoundError:
@@ -144,8 +165,12 @@ def rename(h_check, i_check, csv_check):
                 if len(parts) < 4:
                     break
 
-                if key == parts[3]:
-                    new_name = '{}_{}_'.format(parts[0], parts[1]) + value
+                if key == parts[underscore_count + 1]:
+                    new_name_builder = ''
+                    for underscore in range(underscore_count + 1):
+                        new_name_builder += str(parts[underscore] + '_')
+
+                    new_name = new_name_builder + value
                     print("Replacing " + old_name + "'s name with " + new_name)
                     filenames.append(new_name)
 
