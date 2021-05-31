@@ -120,7 +120,7 @@ def rename(h_check, i_check, csv_check, underscores):
 
         # replacing the old names with the new names
         for key, value in names.items():
-            if key == parts[underscore_count + 1]:
+            if key == parts[underscore_count + 2]:
                 # Renaming the 3D files
                 if parts[-2] == "3D":
                     new_name_builder = ''
@@ -165,7 +165,7 @@ def rename(h_check, i_check, csv_check, underscores):
                 if len(parts) < 4:
                     break
 
-                if key == parts[underscore_count + 1]:
+                if key == parts[underscore_count + 2]:
                     new_name_builder = ''
                     for underscore in range(underscore_count + 1):
                         new_name_builder += str(parts[underscore] + '_')
